@@ -34,6 +34,7 @@ class HuffmanSuite extends FunSuite {
               List('a','b','c','d','e','f','g','h'),
               17
             )
+    val table = List(('a',List(0)),('b',List(1,0,0)),('c',List(1,0,1,0)),('d',List(1,0,1,1)),('e',List(1,1,0,0)),('f',List(1,1,0,1)),('g',List(1,1,1,0)),('h',List(1,1,1,1)))
 	}
 
 
@@ -105,6 +106,12 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
+  test("convert: assignment example"){
+    new TestTrees {
+      assert(convert(t3).reverse === table)
+    }
+  }
+
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
@@ -115,4 +122,15 @@ class HuffmanSuite extends FunSuite {
     assert(decodedSecret == "huffmanestcool".toList)
   }
 
+  test("encode matches quickEncode"){
+    new TestTrees {
+      assert(quickEncode(t3)(List('b','a','c')) === encode(t3)(List('b','a','c')))
+    }
+  }
+
+  test("createCodeTree: assignment example"){
+    new TestTrees {
+      assert(createCodeTree("aaaaaaaabbbcdefgh".toList) === t3)
+    }
+  }
 }
