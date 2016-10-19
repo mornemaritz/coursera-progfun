@@ -34,10 +34,22 @@ object Anagrams {
    *
    *  Note: you must use `groupBy` to implement this method!
    */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences = {
+    w.toLowerCase()
+      .toList
+      .groupBy(c => c)
+      .map{
+        case (ch, chList) => (ch, chList.length)
+      }.toList
+      .sortWith(_._1 < _._1)
+  }
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = ???
+  def sentenceOccurrences(s: Sentence): Occurrences = {
+    s.foreach[Map[Char,List[Char]]](w => w.toLowerCase().toList.groupBy(c => c)).map{
+
+    }
+  }
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
