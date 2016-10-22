@@ -36,7 +36,7 @@ object Huffman {
 
 
   def makeCodeTree(left: CodeTree, right: CodeTree) =
-    Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
+    Fork(left, right, (chars(left) ::: chars(right)).sorted, weight(left) + weight(right))
 
 
 
@@ -116,7 +116,13 @@ object Huffman {
       trees match {
         case Nil => trees
         case x::Nil => trees
-        case x::y::tail => List(makeCodeTree(x,y)) ::: tail
+        case x::y::Nil => List(makeCodeTree(x,y))
+        case x::y::tail => (List(makeCodeTree(x,y)) ::: tail).sortWith((t1,t2) => (t1,t2) match {
+          case (Leaf(_,wl),Leaf(_,wr)) => wl < wr
+          case (Fork(_,_,_,wl),Leaf(_,wr)) => wl < wr
+          case (Leaf(_,wl),Fork(_,_,_,wr)) => wl < wr
+          case (Fork(_,_,_,wl),Fork(_,_,_,wr)) => wl < wr
+        })
       }
     }
   
