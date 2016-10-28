@@ -100,12 +100,13 @@ object Anagrams {
    *  in the example above could have been displayed in some other order.
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = {
-    val comb = for {
-      (chr, occ) <- occurrences // ('a', 2), ('b', 2)
-      subset <- 1 to occ        // ('a', 2) > 1, ('a', 2) > 2, ('b', 2) > 1, ('b', 2) > 2
-    } yield (chr,subset)        // ('a', 1), ('a', 2), ('b', 1), ('b', 2)
-
-    comb.asInstanceOf[Occurrences].toSet.subsets.map(_.toList).filter(c => c.length <= occurrences.length).toList
+    if(occurrences.isEmpty) List(List())
+    else{
+      for{
+        rest <- combinations(occurrences.tail)
+        num <- 0 to occurrences.head._2
+      } yield if (num == 0) rest else (occurrences.head._1, num) :: rest
+    }
   }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
