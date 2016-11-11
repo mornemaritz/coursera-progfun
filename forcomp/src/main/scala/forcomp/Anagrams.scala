@@ -104,8 +104,19 @@ object Anagrams {
     else{
       for{
         rest <- combinations(occurrences.tail)
-        num <- 0 to occurrences.head._2
-      } yield if (num == 0) rest else (occurrences.head._1, num) :: rest
+        num <- 0 to occurrences.head._2 // 0, 1, 2
+      } yield if (num == 0) rest else (occurrences.head._1, num) :: rest // 0 -> List(List()), 1 -> ('b', 1), 2 -> ('b', 2)
+    }
+  }
+
+  def combinations2(occurrences: Occurrences): List[Occurrences] =  {
+    occurrences match {
+      case Nil => List(List())
+      case x::y =>
+        for{
+          rest <- combinations2(y)
+          num <- 0 to occurrences.head._2
+        } yield if (num == 0) rest else (occurrences.head._1, num) :: rest
     }
   }
 
@@ -119,7 +130,17 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    val p =
+    {
+      for{
+        leftCoefficient <- x
+        rightCoefficient <- y
+        if leftCoefficient._1 == rightCoefficient._1
+      } yield (leftCoefficient._1, leftCoefficient._2 - rightCoefficient._2)
+    }
+    p
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *

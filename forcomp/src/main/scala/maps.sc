@@ -15,3 +15,6 @@ showCapital("US")
 
 val fruit = List("apple", "pear", "orange", "pineapple")
 fruit groupBy(_.head)
+
+
+
