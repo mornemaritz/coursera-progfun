@@ -1,3 +1,8 @@
+import forcomp.Anagrams.{Occurrences, Sentence, Word}
+import forcomp._
+
+import scala.None
+
 // ("b",2)
 for{
   rest <- List(List())
@@ -17,4 +22,30 @@ for{
 // 1 -> List(List(("a",1)), List(("a",1),("b",1)), List(("a",1),("b",2)))
 // 2 -> List(List(("a",2)), List(("a",2),("b",1)), List(("a",1),("b",2)))
 // -> List(List(), List(("b",1)), List(("b",2)),List(("a",1)), List(("a",1),("b",1)), List(("a",1),("b",2)),List(("a",2)), List(("a",2),("b",1)), List(("a",1),("b",2)))
+
+val combinations = Anagrams.combinations(
+  Anagrams.sentenceOccurrences(List("Heather"))
+)
+
+def loop(acc: List[Word], combs: List[Occurrences]): List[Word] = {
+  if (combs.isEmpty)
+    acc
+  else
+  (for {
+    comb <- combs
+    if comb.nonEmpty
+  } yield (comb, getWords(comb)) match {
+      case (c, Some(words)) => words.flatMap(w => loop(acc :+ w, combs.map(x => Anagrams.subtract(x,c))))
+      case (_, None) => List.empty
+  }).flatten
+}
+
+def getWords(occ: Occurrences): Option[List[Word]] = {
+  Anagrams.dictionaryByOccurrences.get(occ)
+}
+
+loop(List.empty, combinations)
+
+
+
 

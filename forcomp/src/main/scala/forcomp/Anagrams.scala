@@ -1,5 +1,7 @@
 package forcomp
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Occurs
+
 
 object Anagrams {
 
@@ -49,6 +51,11 @@ object Anagrams {
       s.map(w => {
         w.toLowerCase()
       }).flatMap(w => wordOccurrences(w))
+        .groupBy(_._1)
+        .map{
+          case (ch, chList) => (ch, chList.map(_._2).sum)
+        }.toList
+        .sortWith(_._1 < _._1)
     }
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
@@ -99,26 +106,16 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = {
-    if(occurrences.isEmpty) List(List())
-    else{
-      for{
-        rest <- combinations(occurrences.tail)
-        num <- 0 to occurrences.head._2 // 0, 1, 2
-      } yield if (num == 0) rest else (occurrences.head._1, num) :: rest // 0 -> List(List()), 1 -> ('b', 1), 2 -> ('b', 2)
-    }
-  }
-
-  def combinations2(occurrences: Occurrences): List[Occurrences] =  {
+  def combinations(occurrences: Occurrences): List[Occurrences] =
     occurrences match {
       case Nil => List(List())
       case x::y =>
         for{
-          rest <- combinations2(y)
+          rest <- combinations(y)
           num <- 0 to occurrences.head._2
         } yield if (num == 0) rest else (occurrences.head._1, num) :: rest
-    }
   }
+
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -130,16 +127,13 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
-    val p =
-    {
-      for{
-        leftCoefficient <- x
-        rightCoefficient <- y
-        if leftCoefficient._1 == rightCoefficient._1
-      } yield (leftCoefficient._1, leftCoefficient._2 - rightCoefficient._2)
-    }
-    p
+  def subtract(x: Occurrences, y: Occurrences): Occurrences =
+    x.foldLeft(List.empty.asInstanceOf[Occurrences]){
+      (list,elem) => y.find(_._1 == elem._1) match {
+        case Some(z) if z._2 < elem._2 => list :+ (elem._1, elem._2 - z._2)
+        case Some(z) if z._2 == elem._2 => list
+        case _ => list :+ elem
+      }
   }
 
   /** Returns a list of all anagram sentences of the given sentence.
@@ -182,5 +176,30 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    val all = combinations(sentenceOccurrences(sentence))
+
+    (for {
+      occ <- all
+      if occ.nonEmpty
+    } yield buildSentences(List.empty, all)).flatten
+
+  }
+
+  def buildSentences(wordAcc: List[Word], occurenceList: List[Occurrences]): List[Sentence] = {
+    if (occurenceList.isEmpty)
+      List(wordAcc)
+    else
+      getWords(occurenceList.head) match {
+        case None => buildSentences(wordAcc, occurenceList.tail)
+        case Some(words) =>
+          (for{
+            foundWord <- words
+          } yield buildSentences(wordAcc :+ foundWord, occurenceList.map(o => subtract(o,wordOccurrences(foundWord))))).flatten
+      }
+  }
+
+  def getWords(occ: Occurrences): Option[List[Word]] = {
+    dictionaryByOccurrences.get(occ)
+  }
 }
