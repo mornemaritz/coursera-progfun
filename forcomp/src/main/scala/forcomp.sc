@@ -46,6 +46,11 @@ def getWords(occ: Occurrences): Option[List[Word]] = {
 
 loop(List.empty, combinations)
 
+val combs = Anagrams.combinations(Anagrams.wordOccurrences("abc"))
+
+val rem = combs.map(o => Anagrams.subtract(o,Anagrams.wordOccurrences("a"))).distinct
+
+
 
 
 

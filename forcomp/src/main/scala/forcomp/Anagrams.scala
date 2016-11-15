@@ -177,29 +177,36 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    val all = combinations(sentenceOccurrences(sentence))
-
-    (for {
-      occ <- all
-      if occ.nonEmpty
-    } yield buildSentences(List.empty, all)).flatten
-
+    buildSentences(List.empty, combinations(sentenceOccurrences(sentence)))
   }
 
-  def buildSentences(wordAcc: List[Word], occurenceList: List[Occurrences]): List[Sentence] = {
-    if (occurenceList.isEmpty)
+  def buildSentences(wordAcc: List[Word], occurrenceCombinations: List[Occurrences]): List[Sentence] = {
+
+    if (occurrenceCombinations.isEmpty){
       List(wordAcc)
+    }
     else
-      getWords(occurenceList.head) match {
-        case None => buildSentences(wordAcc, occurenceList.tail)
-        case Some(words) =>
-          (for{
-            foundWord <- words
-          } yield buildSentences(wordAcc :+ foundWord, occurenceList.map(o => subtract(o,wordOccurrences(foundWord))))).flatten
+    {
+      getWords(occurrenceCombinations.head) match {
+        case None => buildSentences(wordAcc, occurrenceCombinations.tail)
+        case Some(words) => {
+          buildSentences(wordAcc :+ words.head, occurrenceCombinations.map(oc => subtract(oc,wordOccurrences(words.head))))
+        }
       }
+    }
   }
 
   def getWords(occ: Occurrences): Option[List[Word]] = {
     dictionaryByOccurrences.get(occ)
+  }
+
+  def findNextWords(occurenceList: List[Occurrences]): Option[List[Word]] = {
+    if(occurenceList.nonEmpty){
+      dictionaryByOccurrences.get(occurenceList.head) match {
+        case None => findNextWords(occurenceList.tail)
+        case Some(words) => Some(words)
+      }
+    }
+    else Option.empty
   }
 }
