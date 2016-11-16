@@ -179,19 +179,19 @@ object Anagrams {
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
     sentence match {
       case Nil => List(Nil)
-      case _ => buildSentences(List.empty, sentenceOccurrences(sentence), combinations(sentenceOccurrences(sentence)), List.empty)
+      case _ => buildSentences(List.empty, sentenceOccurrences(sentence), List.empty)
     }
   }
 
-  def buildSentences(wordAcc: List[Word], sentenceOccurences: Occurrences, occurrenceCombinations: List[Occurrences], foundWords: List[Word]): List[Sentence] = {
+  def buildSentences(wordAcc: List[Word], sentenceOccurences: Occurrences, foundWords: List[Word]): List[Sentence] = {
 
-    (wordAcc, sentenceOccurences, findNextWords(occurrenceCombinations, foundWords)) match {
+    (wordAcc, sentenceOccurences, findNextWords(combinations(sentenceOccurences), foundWords)) match {
       // No words in Acc and no new matches
       case (Nil, _, None) => {
         List.empty
       }
       // At least one word in Acc, no occurrences left, regardless of new matches (*shouldn't* be any)
-      case (x :: _, Nil, None) => {
+      case (x :: _, Nil, _) => {
         List(wordAcc)
       }
       // Still have occurrences from original sentence and no matches, regardless of wordAcc (should be picked up by (Nil, _, None)
@@ -201,21 +201,14 @@ object Anagrams {
       // We've found words, regardless of any other state
       case (_, _, Some(words)) => {
         // Keep searching for the next word, excluding words already found.
-        val continueSearch = buildSentences(wordAcc, sentenceOccurences, occurrenceCombinations, foundWords ++ words)
-
-        // subtract the occurences of the found words (all words have the same occurrences so subtracting the first will suffice
-        val newSentenceOccurences = subtract(sentenceOccurences, wordOccurrences(words.head))
+        val continueSearch = buildSentences(wordAcc, sentenceOccurences, foundWords ++ words)
 
         // Add the words to the accumulator and generate a new occurenceCombinationList
-        val forks = words.flatMap(w => buildSentences(wordAcc :+ w, newSentenceOccurences, combinations(newSentenceOccurences), List.empty))
+        val forks = words.flatMap(w => buildSentences(wordAcc :+ w, subtract(sentenceOccurences, wordOccurrences(words.head)), List.empty))
 
         continueSearch ++ forks
       }
     }
-  }
-
-  def getWords(occ: Occurrences): Option[List[Word]] = {
-    dictionaryByOccurrences.get(occ)
   }
 
   def findNextWords(occurenceList: List[Occurrences], filterList: List[Word]): Option[List[Word]] = {
