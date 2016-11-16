@@ -194,7 +194,7 @@ object Anagrams {
       case (x :: _, Nil, None) => {
         List(wordAcc)
       }
-      // Still have occurrences from original sentence but no occurrence combination data (should not happen)
+      // Still have occurrences from original sentence and no matches, regardless of wordAcc (should be picked up by (Nil, _, None)
       case (_, o :: _, None) => {
         List.empty
       }

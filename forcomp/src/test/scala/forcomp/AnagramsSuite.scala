@@ -148,7 +148,7 @@ class AnagramsSuite extends FunSuite  {
   }
 
   test("sentence anagrams: I love you"){
-    val sentence = List("I love you")
+    val sentence = List("I", "love", "you")
     val anagrams = List(
       List("Lev", "you", "Io"),
       List("Io", "you", "Lev"),
@@ -164,7 +164,7 @@ class AnagramsSuite extends FunSuite  {
   }
 
   test("sentence anagrams: Yell Xerxes"){
-    val sentence = List("Yell Xerxes")
+    val sentence = List("Yell", "Xerxes")
     val anagrams = List(
       List("yell", "Xerxes"),
       List("sex", "yell", "Rex"),
