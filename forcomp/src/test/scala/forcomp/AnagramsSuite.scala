@@ -9,7 +9,7 @@ import Anagrams._
 
 @RunWith(classOf[JUnitRunner])
 class AnagramsSuite extends FunSuite  {
-/*
+
   test("wordOccurrences: abcd") {
     assert(wordOccurrences("abcd") === List(('a', 1), ('b', 1), ('c', 1), ('d', 1)))
   }
@@ -186,7 +186,7 @@ class AnagramsSuite extends FunSuite  {
 
     assert(sentenceAnagrams(sentence).toSet == anagrams.toSet)
   }
-*/
+
   test("sentence anagrams: Heather"){
     val sentence = List("Heather")
     val anagrams = List(
